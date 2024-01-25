@@ -10,7 +10,7 @@ var timeId = "";
 let sequenceControl = 0;
 let sequenceNumber = -1;
 
-let self = {
+let mySelf = {
   data: {
     deviceId: null,
     isConnected: false,
@@ -83,7 +83,7 @@ function isEncrypt(fragNum, list, md5Key) {
     var iv = this.generateAESIV(parseInt(list[2], 16));
     if (fragNum[3] == "0") { //未分包
       list = list.slice(4);
-      self.data.flagEnd = true
+      mySelf.data.flagEnd = true
     } else { //分包
       list = list.slice(6);
     }
@@ -94,7 +94,7 @@ function isEncrypt(fragNum, list, md5Key) {
     }
     if (fragNum[3] == "0") { //未分包
       list = list.slice(4);
-      self.data.flagEnd = true
+      mySelf.data.flagEnd = true
     } else { //分包
       list = list.slice(6);
     }
@@ -162,13 +162,13 @@ function writeDeviceRouterInfoStart(deviceId, serviceId, characteristicId, data)
     frameControl = 0;
   sequenceControl = parseInt(sequenceControl) + 1;
   if (!util._isEmpty(data)) {
-    obj = util.isSubcontractor(data, self.data.isChecksum, sequenceControl, self.data.isEncrypt);
-    frameControl = util.getFrameCTRLValue(self.data.isEncrypt, self.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
+    obj = util.isSubcontractor(data, mySelf.data.isChecksum, sequenceControl, mySelf.data.isEncrypt);
+    frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, mySelf.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
   } else {
-    obj = util.isSubcontractor([self.data.defaultData], self.data.isChecksum, sequenceControl, true);
-    frameControl = util.getFrameCTRLValue(self.data.isEncrypt, self.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
+    obj = util.isSubcontractor([mySelf.data.defaultData], mySelf.data.isChecksum, sequenceControl, true);
+    frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, mySelf.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
   }
-  var defaultData = util.encrypt(aesjs, self.data.md5Key, sequenceControl, obj.lenData, true);
+  var defaultData = util.encrypt(aesjs, mySelf.data.md5Key, sequenceControl, obj.lenData, true);
   var value = util.writeData(util.PACKAGE_CONTROL_VALUE, util.SUBTYPE_WIFI_MODEl, frameControl, sequenceControl, obj.len, defaultData);
   var typedArray = new Uint8Array(value)
   wx.writeBLECharacteristicValue({
@@ -193,14 +193,14 @@ function writeCutomsData(deviceId, serviceId, characteristicId, data) {
     frameControl = 0;
   sequenceControl = parseInt(sequenceControl) + 1;
   if (!util._isEmpty(data)) {
-    obj = util.isSubcontractor(data, self.data.isChecksum, sequenceControl, self.data.isEncrypt);
-    frameControl = util.getFrameCTRLValue(self.data.isEncrypt, self.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
+    obj = util.isSubcontractor(data, mySelf.data.isChecksum, sequenceControl, mySelf.data.isEncrypt);
+    frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, mySelf.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
   } else {
-    var ssidData = getCharCodeat(self.data.customData);
-    obj = util.isSubcontractor(ssidData, self.data.isChecksum, sequenceControl, self.data.isEncrypt);
-    frameControl = util.getFrameCTRLValue(self.data.isEncrypt, self.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
+    var ssidData = getCharCodeat(mySelf.data.customData);
+    obj = util.isSubcontractor(ssidData, mySelf.data.isChecksum, sequenceControl, mySelf.data.isEncrypt);
+    frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, mySelf.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
   }
-  var defaultData = util.encrypt(aesjs, self.data.md5Key, sequenceControl, obj.lenData, true);
+  var defaultData = util.encrypt(aesjs, mySelf.data.md5Key, sequenceControl, obj.lenData, true);
   var value = util.writeData(util.PACKAGE_VALUE, util.SUBTYPE_CUSTOM_DATA, frameControl, sequenceControl, obj.len, defaultData);
   var typedArray = new Uint8Array(value)
   wx.writeBLECharacteristicValue({
@@ -222,8 +222,8 @@ function writeCutomsData(deviceId, serviceId, characteristicId, data) {
 
 function writeGetNearRouterSsid(deviceId, serviceId, characteristicId, data) {
   sequenceControl = parseInt(sequenceControl) + 1;
-  var frameControl = util.getFrameCTRLValue(self.data.isEncrypt, false, util.DIRECTION_OUTPUT, false, false);
-  var value = util.writeData(self.data.PACKAGE_CONTROL_VALUE, util.SUBTYPE_WIFI_NEG, frameControl, sequenceControl, 0, null);
+  var frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, false, util.DIRECTION_OUTPUT, false, false);
+  var value = util.writeData(mySelf.data.PACKAGE_CONTROL_VALUE, util.SUBTYPE_WIFI_NEG, frameControl, sequenceControl, 0, null);
   var typedArray = new Uint8Array(value)
   wx.writeBLECharacteristicValue({
     deviceId: deviceId,
@@ -246,14 +246,14 @@ function writeRouterSsid(deviceId, serviceId, characteristicId, data) {
     frameControl = 0;
   sequenceControl = parseInt(sequenceControl) + 1;
   if (!util._isEmpty(data)) {
-    obj = util.isSubcontractor(data, self.data.isChecksum, sequenceControl, self.data.isEncrypt);
-    frameControl = util.getFrameCTRLValue(self.data.isEncrypt, self.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
+    obj = util.isSubcontractor(data, mySelf.data.isChecksum, sequenceControl, mySelf.data.isEncrypt);
+    frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, mySelf.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
   } else {
-    var ssidData = getCharCodeat(self.data.ssid);
-    obj = util.isSubcontractor(ssidData, self.data.isChecksum, sequenceControl, self.data.isEncrypt);
-    frameControl = util.getFrameCTRLValue(self.data.isEncrypt, self.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
+    var ssidData = getCharCodeat(mySelf.data.ssid);
+    obj = util.isSubcontractor(ssidData, mySelf.data.isChecksum, sequenceControl, mySelf.data.isEncrypt);
+    frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, mySelf.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
   }
-  var defaultData = util.encrypt(aesjs, self.data.md5Key, sequenceControl, obj.lenData, true);
+  var defaultData = util.encrypt(aesjs, mySelf.data.md5Key, sequenceControl, obj.lenData, true);
   var value = util.writeData(util.PACKAGE_VALUE, util.SUBTYPE_SET_SSID, frameControl, sequenceControl, obj.len, defaultData);
   var typedArray = new Uint8Array(value)
   wx.writeBLECharacteristicValue({
@@ -279,14 +279,14 @@ function writeDevicePwd(deviceId, serviceId, characteristicId, data) {
     frameControl = 0;
   sequenceControl = parseInt(sequenceControl) + 1;
   if (!util._isEmpty(data)) {
-    obj = util.isSubcontractor(data, self.data.isChecksum, sequenceControl, self.data.isEncrypt);
-    frameControl = util.getFrameCTRLValue(self.data.isEncrypt, self.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
+    obj = util.isSubcontractor(data, mySelf.data.isChecksum, sequenceControl, mySelf.data.isEncrypt);
+    frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, mySelf.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
   } else {
-    var pwdData = getCharCodeat(self.data.password);
-    obj = util.isSubcontractor(pwdData, self.data.isChecksum, sequenceControl, self.data.isEncrypt);
-    frameControl = util.getFrameCTRLValue(self.data.isEncrypt, self.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
+    var pwdData = getCharCodeat(mySelf.data.password);
+    obj = util.isSubcontractor(pwdData, mySelf.data.isChecksum, sequenceControl, mySelf.data.isEncrypt);
+    frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, mySelf.data.isChecksum, util.DIRECTION_OUTPUT, false, obj.flag);
   }
-  var defaultData = util.encrypt(aesjs, self.data.md5Key, sequenceControl, obj.lenData, true);
+  var defaultData = util.encrypt(aesjs, mySelf.data.md5Key, sequenceControl, obj.lenData, true);
   var value = util.writeData(util.PACKAGE_VALUE, util.SUBTYPE_SET_PWD, frameControl, sequenceControl, obj.len, defaultData);
   var typedArray = new Uint8Array(value)
 
@@ -308,8 +308,8 @@ function writeDevicePwd(deviceId, serviceId, characteristicId, data) {
 
 function writeDeviceEnd(deviceId, serviceId, characteristicId) {
   sequenceControl = parseInt(sequenceControl) + 1;
-  var frameControl = util.getFrameCTRLValue(self.data.isEncrypt, false, util.DIRECTION_OUTPUT, false, false);
-  var value = util.writeData(self.data.PACKAGE_CONTROL_VALUE, util.SUBTYPE_END, frameControl, sequenceControl, 0, null);
+  var frameControl = util.getFrameCTRLValue(mySelf.data.isEncrypt, false, util.DIRECTION_OUTPUT, false, false);
+  var value = util.writeData(mySelf.data.PACKAGE_CONTROL_VALUE, util.SUBTYPE_END, frameControl, sequenceControl, 0, null);
   var typedArray = new Uint8Array(value)
   wx.writeBLECharacteristicValue({
     deviceId: deviceId,
@@ -346,13 +346,16 @@ function init() {
 
   mDeviceEvent.listenStartDiscoverBle(true, function (options) {
 
+    debugger
     if (options.isStart) {
       //第一步检查蓝牙适配器是否可用
       wx.onBluetoothAdapterStateChange(function (res) {
+        console.log('adapterState changed, now is', res)
         if (!res.available) {
 
         }
       });
+      debugger
       //第二步关闭适配器，重新来搜索
       wx.closeBluetoothAdapter({
         complete: function (res) {
@@ -362,9 +365,11 @@ function init() {
                 success: function (res) {
                   wx.stopBluetoothDevicesDiscovery({
                     success: function (res) {
+                      debugger
                       let devicesList = [];
                       let countsTimes = 0;
                       wx.onBluetoothDeviceFound(function (devices) {
+                        debugger
                         //剔除重复设备，兼容不同设备API的不同返回值
                         var isnotexist = true;
                         if (devices.deviceId) {
@@ -421,6 +426,7 @@ function init() {
                       wx.startBluetoothDevicesDiscovery({
                         allowDuplicatesKey: true,
                         success: function (res) {
+                          debugger
                           let obj = {
                             'type': mDeviceEvent.XBLUFI_TYPE.TYPE_GET_DEVICE_LISTS_START,
                             'result': true,
@@ -432,6 +438,7 @@ function init() {
 
                         },
                         fail: function (res) {
+                          debugger
                           let obj = {
                             'type': mDeviceEvent.XBLUFI_TYPE.TYPE_GET_DEVICE_LISTS_START,
                             'result': false,
@@ -507,7 +514,7 @@ function init() {
             deviceId: options.deviceId,
             mtu: 128
           })
-          self.data.deviceId = options.deviceId
+          mySelf.data.deviceId = options.deviceId
           mDeviceEvent.notifyDeviceMsgEvent({
             'type': mDeviceEvent.XBLUFI_TYPE.TYPE_CONNECTED,
             'result': true,
@@ -518,7 +525,7 @@ function init() {
           });
         },
         fail: function (res) {
-          self.data.deviceId = null
+          mySelf.data.deviceId = null
           mDeviceEvent.notifyDeviceMsgEvent({
             'type': mDeviceEvent.XBLUFI_TYPE.TYPE_CONNECTED,
             'result': false,
@@ -530,7 +537,7 @@ function init() {
       deviceId: options.deviceId,
       success: function (res) {
         console.log('断开成功')
-        self.data.deviceId = null
+        mySelf.data.deviceId = null
         mDeviceEvent.notifyDeviceMsgEvent({
           'type': mDeviceEvent.XBLUFI_TYPE.TYPE_CLOSE_CONNECTED,
           'result': true,
@@ -541,7 +548,7 @@ function init() {
         });
       },
       fail: function (res) {
-        self.data.deviceId = null
+        mySelf.data.deviceId = null
         mDeviceEvent.notifyDeviceMsgEvent({
           'type': mDeviceEvent.XBLUFI_TYPE.TYPE_CLOSE_CONNECTED,
           'result': false,
@@ -554,8 +561,8 @@ function init() {
   mDeviceEvent.listenInitBleEsp32(true, function (options) {
     sequenceControl = 0;
     sequenceNumber = -1;
-    self = null
-    self = {
+    mySelf = null
+    mySelf = {
       data: {
         deviceId: null,
         isConnected: false,
@@ -585,15 +592,16 @@ function init() {
       }
     }
     let deviceId = options.deviceId
-    self.data.deviceId = options.deviceId
+    mySelf.data.deviceId = options.deviceId
     wx.getBLEDeviceServices({
       // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立链接
       deviceId: deviceId,
       success: function (res) {
+        console.log('getBLEDeviceServices', res)
         var services = res.services;
         if (services.length > 0) {
           for (var i = 0; i < services.length; i++) {
-            if (services[i].uuid === self.data.service_uuid) {
+            if (services[i].uuid === mySelf.data.service_uuid) {
               var serviceId = services[i].uuid;
               wx.getBLEDeviceCharacteristics({
                 // 这里的 deviceId 需要已经通过 createBLEConnection 与对应设备建立链接
@@ -604,16 +612,16 @@ function init() {
                   if (list.length > 0) {
                     for (var i = 0; i < list.length; i++) {
                       var uuid = list[i].uuid;
-                      if (uuid == self.data.characteristic_write_uuid) {
-                        self.data.serviceId = serviceId;
-                        self.data.uuid = uuid;
+                      if (uuid == mySelf.data.characteristic_write_uuid) {
+                        mySelf.data.serviceId = serviceId;
+                        mySelf.data.uuid = uuid;
                         wx.notifyBLECharacteristicValueChange({
                           state: true, // 启用 notify 功能
                           deviceId: deviceId,
                           serviceId: serviceId,
                           characteristicId: list[1].uuid,
                           success: function (res) {
-                            let characteristicId = self.data.characteristic_write_uuid
+                            let characteristicId = mySelf.data.characteristic_write_uuid
                             //通知设备交互方式（是否加密） start
                             client = util.blueDH(util.DH_P, util.DH_G, crypto);
                             var kBytes = util.uint8ArrayToArray(client.getPublicKey());
@@ -650,7 +658,7 @@ function init() {
                             wx.onBLECharacteristicValueChange(function (res) {
                               let list2 = (util.ab2hex(res.value));
                               // start
-                              let result = self.data.result;
+                              let result = mySelf.data.result;
                               if (list2.length < 4) {
                                 cosnole.log(407);
                                 return false;
@@ -663,11 +671,11 @@ function init() {
                                 return false;
                               }
                               var fragNum = util.hexToBinArray(list2[1]);
-                              list2 = isEncrypt(fragNum, list2, self.data.md5Key);
+                              list2 = isEncrypt(fragNum, list2, mySelf.data.md5Key);
                               result = result.concat(list2);
-                              self.data.result = result
-                              if (self.data.flagEnd) {
-                                self.data.flagEnd = false
+                              mySelf.data.result = result
+                              if (mySelf.data.flagEnd) {
+                                mySelf.data.flagEnd = false
                                 if (type == 1) {
                                   let what = [];
                                   console.log("recieve data subType: ", subType)
@@ -715,7 +723,7 @@ function init() {
                                       var arr = util.hexByInt(result.join(""));
                                       var clientSecret = client.computeSecret(new Uint8Array(arr));
                                       var md5Key = md5.array(clientSecret);
-                                      self.data.md5Key = md5Key;
+                                      mySelf.data.md5Key = md5Key;
                                       mDeviceEvent.notifyDeviceMsgEvent({
                                         'type': mDeviceEvent.XBLUFI_TYPE.TYPE_INIT_ESP32_RESULT,
                                         'result': true,
@@ -733,11 +741,11 @@ function init() {
 
                                     default:
                                       console.log(468);
-                                      //self.setFailProcess(true, util.descFailList[4])
+                                      //mySelf.setFailProcess(true, util.descFailList[4])
                                       console.log("入网失败 468 :", util.failList[4]);
                                       break;
                                   }
-                                  self.data.result = []
+                                  mySelf.data.result = []
                                 } else {
                                   //console.log(472);
                                   console.log("入网失败 472:", util.failList[4]);
@@ -789,19 +797,19 @@ function init() {
   })
 
   mDeviceEvent.listenSendRouterSsidAndPassword(true, function (options) {
-    self.data.password = options.password
-    self.data.ssid = options.ssid
-    writeDeviceRouterInfoStart(self.data.deviceId, self.data.service_uuid, self.data.characteristic_write_uuid, null);
+    mySelf.data.password = options.password
+    mySelf.data.ssid = options.ssid
+    writeDeviceRouterInfoStart(mySelf.data.deviceId, mySelf.data.service_uuid, mySelf.data.characteristic_write_uuid, null);
   })
 
 
   mDeviceEvent.listenSendCustomData(true, function (options) {
-    self.data.customData = options.customData
-    writeCutomsData(self.data.deviceId, self.data.service_uuid, self.data.characteristic_write_uuid, null);
+    mySelf.data.customData = options.customData
+    writeCutomsData(mySelf.data.deviceId, mySelf.data.service_uuid, mySelf.data.characteristic_write_uuid, null);
   })
 
   mDeviceEvent.listenSendGetNearRouterSsid(true, function (options) {
-    writeGetNearRouterSsid(self.data.deviceId, self.data.service_uuid, self.data.characteristic_write_uuid, null);
+    writeGetNearRouterSsid(mySelf.data.deviceId, mySelf.data.service_uuid, mySelf.data.characteristic_write_uuid, null);
   })
 
 }
@@ -809,7 +817,7 @@ function init() {
 function getList(arr, totalLength, curLength) {
   // console.log(totalLength)
   // console.log(arr)
-  var self = this;
+  var mySelf = this;
   if (arr.length > 0) {
     var len = parseInt(arr[0], 16);
     curLength += (1 + len);
